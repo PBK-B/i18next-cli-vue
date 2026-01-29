@@ -11,7 +11,7 @@ permissions:
 
 jobs:
     release:
-        name: Release
+        name: Version Bump & Create Tag
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -37,10 +37,17 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            - name: Create Release Pull Request or Release
-              uses: changesets/changesets-action@main
+            - name: Version Bump and Tag
+              uses: changesets/changesets-action@v4
               with:
-                  publish: npm publish
+                  version: npm version --git-tag-version-version
+                  commit: 'chore: version bump'
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Push Changes
+              run: |
+                  git push
+                  git push --tags
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
