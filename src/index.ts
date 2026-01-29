@@ -30,7 +30,7 @@ export default function i18nextVuePlugin(options: VuePluginOptions = {}): Plugin
 	validateOptions(normalizedOptions);
 
 	return {
-		name: 'i18next-cli-plugin-vue',
+		name: 'i18next-cli-vue',
 
 		onLoad: createOnLoadHandler(normalizedOptions),
 

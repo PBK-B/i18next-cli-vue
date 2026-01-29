@@ -38,8 +38,8 @@ function parseVue2SFC(code: string): Vue2Descriptor {
 	return {
 		template: result.template?.content || '',
 		script: result.script?.content || '',
-		styles: result.styles.map((style) => style.content),
-		customBlocks: result.customBlocks.map((block) => ({
+		styles: result.styles.map((style: { content: string }) => style.content),
+		customBlocks: result.customBlocks.map((block: { type: string; content: string }) => ({
 			type: block.type,
 			content: block.content,
 		})),

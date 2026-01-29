@@ -1,4 +1,4 @@
-# i18next-cli-plugin-vue
+# i18next-cli-vue
 
 i18next-cli 插件，用于从 Vue 单文件组件 (SFC) 中提取 i18n 翻译键。
 
@@ -13,7 +13,7 @@ i18next-cli 插件，用于从 Vue 单文件组件 (SFC) 中提取 i18n 翻译�
 ## 安装
 
 ```bash
-npm install i18next-cli-plugin-vue --save-dev
+npm install i18next-cli-vue --save-dev
 ```
 
 ## 使用方法
@@ -23,7 +23,7 @@ npm install i18next-cli-plugin-vue --save-dev
 ```javascript
 // i18next.config.js
 import { defineConfig } from 'i18next-cli';
-import i18nextVuePlugin from 'i18next-cli-plugin-vue';
+import i18nextVuePlugin from 'i18next-cli-vue';
 
 export default defineConfig({
 	locales: ['en', 'zh', 'fr'],
@@ -41,7 +41,7 @@ export default defineConfig({
 ```javascript
 // i18next.config.js
 import { defineConfig } from 'i18next-cli';
-import i18nextVuePlugin from 'i18next-cli-plugin-vue';
+import i18nextVuePlugin from 'i18next-cli-vue';
 
 export default defineConfig({
 	locales: ['en', 'zh'],

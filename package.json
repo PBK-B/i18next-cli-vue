@@ -1,7 +1,9 @@
 {
-	"name": "i18next-cli-plugin-vue",
-	"version": "1.0.0",
+	"type": "module",
+	"name": "i18next-cli-vue",
+	"version": "1.0.1",
 	"description": "i18next-cli plugin for extracting i18n keys from Vue SFC files",
+	"author": "PBK-B",
 	"main": "dist/index.js",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -28,14 +30,15 @@
 		"vue": "^2.6.0 || ^3.0.0"
 	},
 	"devDependencies": {
-		"@rollup/plugin-typescript": "^11.1.5",
-		"@types/node": "^20.0.0",
-		"@vue/compiler-sfc": "^3.4.0",
+		"@rollup/plugin-typescript": "^12.3.0",
+		"@types/node": "^25.1.0",
+		"@vue/compiler-sfc": "^3.5.27",
 		"prettier": "^3.8.1",
-		"rollup": "^4.0.0",
-		"tslib": "^2.6.0",
-		"typescript": "^5.0.0",
-		"vitest": "^1.0.0"
+		"rollup": "^4.57.0",
+		"tslib": "^2.8.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18",
+		"vue-template-compiler": "^2.7.16"
 	},
 	"keywords": [
 		"i18next",
@@ -48,6 +51,10 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/i18next/i18next-cli-plugin-vue"
+		"url": "https://github.com/PBK-B/i18next-cli-vue"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org",
+		"access": "public"
 	}
 }
