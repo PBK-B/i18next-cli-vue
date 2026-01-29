@@ -1,0 +1,52 @@
+{
+  "name": "i18next-cli-plugin-vue",
+  "version": "1.0.0-alpha.1",
+  "description": "i18next-cli plugin for extracting i18n keys from Vue SFC files",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src"
+  },
+  "peerDependencies": {
+    "i18next-cli": "^1.11.11",
+    "vue": "^2.6.0 || ^3.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/node": "^20.0.0",
+    "@vue/compiler-sfc": "^3.4.0",
+    "rollup": "^4.0.0",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "vue-template-compiler": "^2.7.0"
+  },
+  "keywords": [
+    "i18next",
+    "i18next-cli",
+    "vue",
+    "vue3",
+    "internationalization",
+    "translation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/i18next/i18next-cli-plugin-vue"
+  }
+}
