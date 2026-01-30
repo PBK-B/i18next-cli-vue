@@ -35,11 +35,11 @@ export default function i18nextVuePlugin(options: VuePluginOptions = {}): Plugin
 		onLoad: createOnLoadHandler(normalizedOptions),
 
 		extractKeysFromExpression: (_expression: any, _config: any, _logger: any): string[] => {
-			return [];
+			return extractKeysFromExpression(_expression, _config);
 		},
 
 		extractContextFromExpression: (_expression: any, _config: any, _logger: any): string[] => {
-			return [];
+			return extractContextFromExpression(_expression, _config);
 		},
 	};
 }
