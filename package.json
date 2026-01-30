@@ -1,7 +1,7 @@
 {
 	"type": "module",
 	"name": "i18next-cli-vue",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "i18next-cli plugin for extracting i18n keys from Vue SFC files",
 	"author": "PBK-B",
 	"main": "dist/index.js",
