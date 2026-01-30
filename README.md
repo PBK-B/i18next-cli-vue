@@ -1,6 +1,6 @@
 # i18next-cli-vue
 
-[![npm version](https://img.shields.io/npm/v/i18next-cli-vue.svg)](https://www.npmjs.com/package/i18next-cli-vue) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Vue 2.6+](https://img.shields.io/badge/Vue-2.6+-41b883.svg)](https://vuejs.org/) [![Vue 3.x](https://img.shields.io/badge/Vue-3.x-41b883.svg)](https://vuejs.org/)
+[![npm version](https://img.shields.io/npm/v/i18next-cli-vue.svg)](https://www.npmjs.com/package/i18next-cli-vue) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Vue 2.6+](https://img.shields.io/badge/Vue-2.6+-41b883.svg)](https://vuejs.org/) [![Vue 3.x](https://img.shields.io/badge/Vue-3.x-41b883.svg)](https://vuejs.org/) [![pkg.pr.new](https://pkg.pr.new/badge/PBK-B/i18next-cli-vue)](https://pkg.pr.new/~/PBK-B/i18next-cli-vue)
 
 [English](README.md) | [中文](README.zh-CN.md)
 

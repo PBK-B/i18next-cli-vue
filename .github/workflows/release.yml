@@ -3,7 +3,7 @@ name: Release
 on:
     push:
         branches:
-            - main
+            - master
 
 permissions:
     contents: write
@@ -23,8 +23,8 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: '24'
-                  registry-url: 'https://registry.npmjs.org'
+                  node-version: "24"
+                  registry-url: "https://registry.npmjs.org"
 
             - name: Install dependencies
               run: npm ci
@@ -41,7 +41,7 @@ jobs:
               uses: changesets/changesets-action@v4
               with:
                   version: npm version --git-tag-version-version
-                  commit: 'chore: version bump'
+                  commit: "chore: version bump"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -20,7 +20,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: "24"
+                  node-version: "25"
                   registry-url: "https://registry.npmjs.org"
 
             - name: Install dependencies
@@ -42,7 +42,6 @@ jobs:
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:
-                  files: dist/**
                   tag_name: ${{ github.ref }}
                   name: Release ${{ github.ref_name }}
                   body: ${{ steps.changelog.outputs.body }}
