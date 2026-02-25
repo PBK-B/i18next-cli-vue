@@ -129,6 +129,35 @@ export default {
 </script>
 ```
 
+## Lint Usage
+
+Since `i18next-cli@1.44.0`, lint supports plugin hooks. `i18next-cli-vue` now provides `lintOnLoad` and `lintOnResult` so `.vue` files can be linted directly.
+
+```javascript
+// i18next.config.js
+import { defineConfig } from 'i18next-cli';
+import i18nextVuePlugin from 'i18next-cli-vue';
+
+export default defineConfig({
+	locales: ['en', 'zh'],
+	extract: {
+		input: 'src/**/*.{vue,ts,js}',
+		output: 'locales/{{language}}/{{ns}}.json',
+	},
+	plugins: [i18nextVuePlugin()],
+});
+```
+
+If you only want to lint JavaScript/TypeScript files, you can still ignore Vue SFCs:
+
+```javascript
+lint: {
+	// Only lint JS/TS files
+	input: ['src/**/*.{js,ts,jsx,tsx}'],
+	ignore: ['**/*.vue'],
+},
+```
+
 ## API
 
 ### Options

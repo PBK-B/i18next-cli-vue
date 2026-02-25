@@ -37,6 +37,7 @@ export interface VueSFCDescriptor {
 
 export interface VueSFCParser {
 	extractScript(): string;
+	extractScriptAsync?(): Promise<string>;
 	extractTemplate(): string;
 	extractStyles(): string[];
 	extractCustomBlocks(): VueSFCPart[];

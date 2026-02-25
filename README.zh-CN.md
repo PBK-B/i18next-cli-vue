@@ -129,6 +129,35 @@ export default {
 </script>
 ```
 
+## Lint 使用说明
+
+从 `i18next-cli@1.44.0` 开始，lint 已支持 plugin 钩子。`i18next-cli-vue` 现已实现 `lintOnLoad` 与 `lintOnResult`，可以直接对 `.vue` 文件进行 lint。
+
+```javascript
+// i18next.config.js
+import { defineConfig } from 'i18next-cli';
+import i18nextVuePlugin from 'i18next-cli-vue';
+
+export default defineConfig({
+	locales: ['en', 'zh'],
+	extract: {
+		input: 'src/**/*.{vue,ts,js}',
+		output: 'locales/{{language}}/{{ns}}.json',
+	},
+	plugins: [i18nextVuePlugin()],
+});
+```
+
+如果你只想对 JavaScript/TypeScript 文件进行 lint，仍可通过以下配置忽略 Vue SFC：
+
+```javascript
+lint: {
+	// 只对 JS/TS 文件进行 lint
+	input: ['src/**/*.{js,ts,jsx,tsx}'],
+	ignore: ['**/*.vue'],
+},
+```
+
 ## API
 
 ### 选项

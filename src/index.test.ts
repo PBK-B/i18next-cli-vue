@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import i18nextVuePlugin from './index';
+import type { VuePluginOptions } from './types';
 import { normalizeOptions, validateOptions, DEFAULT_OPTIONS } from './options';
 import { detectVueVersion, createParser } from './sfc/parser';
 import { extractTemplateKeys } from './template/extract';
 import { extractScriptKeys, extractKeysFromExpression, extractContextFromExpression } from './script/extract';
 import { isVueFile } from './utils';
+import { extractVueLintIssues } from './lint/extract';
 
 describe('i18next-cli-vue', () => {
 	describe('Plugin Initialization', () => {
@@ -12,6 +14,8 @@ describe('i18next-cli-vue', () => {
 			const plugin = i18nextVuePlugin();
 			expect(plugin.name).toBe('i18next-cli-vue');
 			expect(plugin.onLoad).toBeDefined();
+			expect((plugin as any).lintOnLoad).toBeDefined();
+			expect((plugin as any).lintOnResult).toBeDefined();
 		});
 
 		it('should create plugin with custom options', () => {
@@ -26,6 +30,229 @@ describe('i18next-cli-vue', () => {
 			});
 
 			expect(plugin.name).toBe('i18next-cli-vue');
+		});
+	});
+
+	describe('Lint Plugin Hooks', () => {
+		it('should transform vue file for lintOnLoad', async () => {
+			const plugin = i18nextVuePlugin() as any;
+			await plugin.lintSetup?.({
+				config: {
+					extract: {
+						input: ['src/**/*.{vue,ts}'],
+						output: 'locales/{{language}}/{{namespace}}.json',
+					},
+					locales: ['en'],
+				},
+				logger: {
+					info: () => undefined,
+					warn: () => undefined,
+					error: () => undefined,
+				},
+			});
+
+			const vueCode = `<template><span data-i18n="test.key">Hello</span><button title="Submit">Click</button></template><script>t('script.key')</script>`;
+			const result = await plugin.lintOnLoad(vueCode, 'App.vue');
+
+			expect(result).toContain("t('script.key')");
+			expect(result).toContain("t('test.key')");
+		});
+
+		it('should pass through non-vue file in lintOnLoad', async () => {
+			const plugin = i18nextVuePlugin() as any;
+			const result = await plugin.lintOnLoad('const x = 1;', 'main.ts');
+			expect(result).toBeUndefined();
+		});
+
+		it('should merge lint issues in lintOnResult', async () => {
+			const plugin = i18nextVuePlugin() as any;
+			await plugin.lintSetup?.({
+				config: {
+					extract: {
+						input: ['src/**/*.{vue,ts}'],
+						output: 'locales/{{language}}/{{namespace}}.json',
+					},
+					locales: ['en'],
+				},
+				logger: {
+					info: () => undefined,
+					warn: () => undefined,
+					error: () => undefined,
+				},
+			});
+
+			const vueCode = `<template><button title="Submit">Click</button></template>`;
+			await plugin.lintOnLoad(vueCode, 'Comp.vue');
+
+			const result = await plugin.lintOnResult('Comp.vue', []);
+			expect(result).toBeDefined();
+			expect(result.length).toBeGreaterThan(0);
+			expect(result.some((i: any) => i.text === 'Submit')).toBe(true);
+		});
+	});
+
+	describe('Vue Lint Extraction', () => {
+		it('should extract text and attribute hardcoded issues', () => {
+			const code = `<template>
+  <div>
+    <p>Hello World</p>
+    <button title="Submit">Save</button>
+  </div>
+</template>`;
+
+			const issues = extractVueLintIssues(code, {
+				locales: ['en'],
+				extract: {
+					input: ['src/**/*.{vue,ts}'],
+					output: 'locales/{{language}}/{{namespace}}.json',
+					transComponents: ['Trans'],
+				},
+				lint: {},
+			});
+
+			expect(issues.some((i) => i.text === 'Hello World')).toBe(true);
+			expect(issues.some((i) => i.text === 'Submit')).toBe(true);
+			expect(issues.some((i) => i.text === 'Save')).toBe(true);
+		});
+
+		it('should ignore text inside Trans component', () => {
+			const code = `<template>
+  <Trans>Ignore Me</Trans>
+  <p>Keep Me</p>
+</template>`;
+
+			const issues = extractVueLintIssues(code, {
+				locales: ['en'],
+				extract: {
+					input: ['src/**/*.{vue,ts}'],
+					output: 'locales/{{language}}/{{namespace}}.json',
+					transComponents: ['Trans'],
+				},
+				lint: {},
+			});
+
+			expect(issues.some((i) => i.text === 'Ignore Me')).toBe(false);
+			expect(issues.some((i) => i.text === 'Keep Me')).toBe(true);
+		});
+
+		it('should ignore vue2 filter interpolation text', () => {
+			const code = `<template>
+  <p>{{ message | capitalize }}</p>
+  <p>Visible Text</p>
+</template>`;
+
+			const issues = extractVueLintIssues(code, {
+				locales: ['en'],
+				extract: {
+					input: ['src/**/*.{vue,ts}'],
+					output: 'locales/{{language}}/{{namespace}}.json',
+				},
+			});
+
+			expect(issues.some((i) => i.text.includes('message | capitalize'))).toBe(false);
+			expect(issues.some((i) => i.text === 'Visible Text')).toBe(true);
+		});
+
+		it('should honor acceptedAttributes-only mode', () => {
+			const code = `<template>
+  <button title="Confirm">Click Me</button>
+</template>`;
+
+			const issues = extractVueLintIssues(code, {
+				locales: ['en'],
+				extract: {
+					input: ['src/**/*.{vue,ts}'],
+					output: 'locales/{{language}}/{{namespace}}.json',
+				},
+				lint: {
+					acceptedTags: [],
+					acceptedAttributes: ['title'],
+				},
+			});
+
+			expect(issues.some((i) => i.text === 'Confirm')).toBe(true);
+			expect(issues.some((i) => i.text === 'Click Me')).toBe(false);
+		});
+	});
+
+	describe('Vue2 Adaptation', () => {
+		it('should transpile vue2 lang ts script in onLoad', async () => {
+			const plugin = i18nextVuePlugin({ vueVersion: 2 }) as any;
+			const vueCode = `<template><div data-i18n="tpl.key">Hi</div></template><script lang="ts">interface User { name: string }\nconst msg: string = 'ok'\nt('legacy.key')</script>`;
+
+			const result = await plugin.onLoad(vueCode, 'Legacy.vue');
+
+			expect(result).toContain("t('legacy.key')");
+			expect(result).toContain("t('tpl.key')");
+			expect(result).not.toContain('interface User');
+		});
+
+		it('should transpile vue2 script with implicit ts syntax for lintOnLoad', async () => {
+			const plugin = i18nextVuePlugin({ vueVersion: 2 }) as any;
+			await plugin.lintSetup?.({
+				config: {
+					locales: ['en'],
+					extract: {
+						input: ['src/**/*.{vue,ts}'],
+						output: 'locales/{{language}}/{{namespace}}.json',
+					},
+				},
+				logger: {
+					info: () => undefined,
+					warn: () => undefined,
+					error: () => undefined,
+				},
+			});
+
+			const vueCode = `<template><div data-i18n="tpl.key">Hi</div></template><script>type A = { name: string }\nconst v: A = { name: 'a' }</script>`;
+			const transformed = await plugin.lintOnLoad(vueCode, 'LegacyLint.vue');
+
+			expect(transformed).not.toContain('type A =');
+			expect(transformed).toContain("t('tpl.key')");
+		});
+
+		it('should lint vue2 template static attrs and text', async () => {
+			const plugin = i18nextVuePlugin({ vueVersion: 2 }) as any;
+			await plugin.lintSetup?.({
+				config: {
+					locales: ['en'],
+					extract: {
+						input: ['src/**/*.{vue,ts}'],
+						output: 'locales/{{language}}/{{namespace}}.json',
+					},
+				},
+				logger: {
+					info: () => undefined,
+					warn: () => undefined,
+					error: () => undefined,
+				},
+			});
+
+			const vueCode = `<template><button title="Submit">Click</button></template><script>export default {}</script>`;
+			await plugin.lintOnLoad(vueCode, 'Legacy.vue');
+			const result = await plugin.lintOnResult('Legacy.vue', []);
+
+			expect(result.some((i: any) => i.text === 'Submit')).toBe(true);
+			expect(result.some((i: any) => i.text === 'Click')).toBe(true);
+		});
+
+		it('should skip dynamic vue2 bindings from attribute hardcoded lint', () => {
+			const code = `<template>
+  <button :title="titleText" v-bind:placeholder="ph">A</button>
+  <button title="Plain">B</button>
+</template>`;
+
+			const issues = extractVueLintIssues(code, {
+				locales: ['en'],
+				extract: {
+					input: ['src/**/*.{vue,ts}'],
+					output: 'locales/{{language}}/{{namespace}}.json',
+				},
+			});
+
+			expect(issues.some((i) => i.text === 'titleText')).toBe(false);
+			expect(issues.some((i) => i.text === 'ph')).toBe(false);
+			expect(issues.some((i) => i.text === 'Plain')).toBe(true);
 		});
 	});
 
@@ -47,7 +274,7 @@ describe('i18next-cli-vue', () => {
 		});
 
 		it('should override all defaults when all options provided', () => {
-			const customOptions = {
+			const customOptions: VuePluginOptions = {
 				vueVersion: 3,
 				vueBindAttr: false,
 				functions: ['t', '$t', 'trans'],
@@ -272,15 +499,15 @@ describe('i18next-cli-vue', () => {
 	});
 
 	describe('onLoad Handler', () => {
-		it('should pass through non-vue files', () => {
+		it('should pass through non-vue files', async () => {
 			const plugin = i18nextVuePlugin();
 			const code = 'const x = 1;';
-			const result = plugin.onLoad!(code, 'App.ts');
+			const result = await plugin.onLoad!(code, 'App.ts');
 
 			expect(result).toBe(code);
 		});
 
-		it('should process vue files', () => {
+		it('should process vue files', async () => {
 			const plugin = i18nextVuePlugin();
 			const vueCode = `<template>
   <span data-i18n="test.key"></span>
@@ -288,34 +515,34 @@ describe('i18next-cli-vue', () => {
 <script>
 t('script.key')
 </script>`;
-			const result = plugin.onLoad!(vueCode, 'App.vue');
+			const result = await plugin.onLoad!(vueCode, 'App.vue');
 
 			expect(result).toContain("t('test.key')");
 			expect(result).toContain("t('script.key')");
 		});
 
-		it('should handle files with custom filePatterns', () => {
+		it('should handle files with custom filePatterns', async () => {
 			const plugin = i18nextVuePlugin({ filePatterns: ['.nvue'] });
 			const vueCode = `<template>
   <span data-i18n="test.key"></span>
 </template>`;
-			const result = plugin.onLoad!(vueCode, 'App.nvue');
+			const result = await plugin.onLoad!(vueCode, 'App.nvue');
 
 			expect(result).toContain("t('test.key')");
 		});
 
-		it('should skip non-matching file extensions', () => {
+		it('should skip non-matching file extensions', async () => {
 			const plugin = i18nextVuePlugin({ filePatterns: ['.vue'] });
 			const code = 't("test")';
-			const result = plugin.onLoad!(code, 'App.nvue');
+			const result = await plugin.onLoad!(code, 'App.nvue');
 
 			expect(result).toBe(code);
 		});
 
-		it('should return empty for vue file with no content', () => {
+		it('should return empty for vue file with no content', async () => {
 			const plugin = i18nextVuePlugin();
 			const code = 't("test")';
-			const result = plugin.onLoad!(code, 'App.vue');
+			const result = await plugin.onLoad!(code, 'App.vue');
 
 			expect(result).toBe('');
 		});
