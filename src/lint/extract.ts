@@ -223,7 +223,7 @@ export function extractVueLintIssues(code: string, config?: I18nextToolkitConfig
 
 			const inIgnoredTree = stack.some((name) => rules.ignoredTags.has(name) || rules.transComponents.has(name));
 			const thisIgnored = rules.ignoredTags.has(parsed.name) || rules.transComponents.has(parsed.name);
-			const allowTagText = !inIgnoredTree && !thisIgnored && (!!rules.acceptedTags ? rules.acceptedTags.has(parsed.name) : true);
+			const allowTagText = !inIgnoredTree && !thisIgnored && (rules.acceptedTags ? rules.acceptedTags.has(parsed.name) : true);
 
 			for (const attr of parsed.attrs) {
 				if (attr.name.startsWith(':') || attr.name.startsWith('@') || attr.name.startsWith('v-')) {

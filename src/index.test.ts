@@ -576,7 +576,7 @@ t('script.key')
 <script setup>
 const { t } = useTranslation().t
 t('key1')
-\$t('key2')
+			$t('key2')
 </script>`;
 
 			const keys = extractScriptKeys(script, options);
@@ -593,7 +593,7 @@ t('key1')
 export default {
   data() {
     return {
-      title: this.\$t('page.title')
+			      title: this.$t('page.title')
     }
   }
 }`;
@@ -610,7 +610,7 @@ export default {
 export default {
   methods: {
     submit() {
-      return this.\$t('button.submit')
+			      return this.$t('button.submit')
     }
   }
 }`;

@@ -4,12 +4,10 @@ export function extractScriptKeys(script: string, options: NormalizedVuePluginOp
 	const keys: ExtractedKeyInfo[] = [];
 
 	const functions = options.functions;
-	const namespaceFunctions = options.namespaceFunctions;
-
 	const functionCalls = extractFunctionCalls(script, functions);
 
 	for (const call of functionCalls) {
-		const keyInfo = parseFunctionCall(call, options);
+		const keyInfo = parseFunctionCall(call);
 		if (keyInfo) {
 			keys.push(keyInfo);
 		}
@@ -148,7 +146,7 @@ function parseOptions(optionsStr: string): Record<string, unknown> | null {
 	}
 }
 
-function parseFunctionCall(call: FunctionCall, options: NormalizedVuePluginOptions): ExtractedKeyInfo | null {
+function parseFunctionCall(call: FunctionCall): ExtractedKeyInfo | null {
 	const namespace = extractNamespace(call.key);
 
 	let key = call.key;
@@ -185,7 +183,7 @@ export function extractKeysFromExpression(expression: string, options: Normalize
 	return keys;
 }
 
-export function extractContextFromExpression(expression: string, options: NormalizedVuePluginOptions): string[] {
+export function extractContextFromExpression(expression: string, _options: NormalizedVuePluginOptions): string[] {
 	const contexts: string[] = [];
 
 	const contextPattern = /context\s*:\s*['"]([^'"]+)['"]/g;

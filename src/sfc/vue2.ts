@@ -71,7 +71,7 @@ function extractVueScriptLang(code: string): string | undefined {
 }
 
 function looksLikeTypeScript(script: string): boolean {
-	return /\binterface\s+[A-Za-z_]/.test(script) || /\btype\s+[A-Za-z_]/.test(script) || /:\s*[A-Za-z_][\w<>,\s|&\[\]?]*/.test(script);
+	return /\binterface\s+[A-Za-z_]/.test(script) || /\btype\s+[A-Za-z_]/.test(script) || /:\s*[A-Za-z_][\w<>,\s|&?]*(?:\[\])?/.test(script);
 }
 
 async function transformTypeScript(code: string): Promise<string> {

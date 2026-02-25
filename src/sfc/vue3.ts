@@ -26,8 +26,7 @@ async function transformTypeScript(code: string): Promise<string> {
 			},
 		});
 		return result.code;
-	} catch (err) {
-		// 如果转换失败，返回原始代码
+	} catch {
 		return code;
 	}
 }
